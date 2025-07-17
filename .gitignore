@@ -1,13 +1,4 @@
-# MySQL
-MYSQL_ROOT_PASSWORD=root
-MYSQL_DATABASE=app_db
-MYSQL_USER=root
-MYSQL_PASSWORD=root
-
-# PHP
-APP_ENV=development
-XDEBUG_ENABLED=1
-
-# phpMyAdmin (опционально)
-PMA_USER=root
-PMA_PASSWORD=root
+.env
+mysql_data/
+.idea/
+.vscode/
