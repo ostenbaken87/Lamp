@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  php:
+    build: .
+    image: php_dev
+    container_name: php-dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/var/www/html
+    environment:
+      - APP_ENV=${APP_ENV:-development}
+      - XDEBUG_ENABLED=${XDEBUG_ENABLED:-0}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0.32
+    container_name: mysql-dev
+    user: "1000:1000"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-dev
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${PMA_USER:-root}
+      PMA_PASSWORD: ${PMA_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
